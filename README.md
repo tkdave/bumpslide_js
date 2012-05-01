@@ -1,13 +1,13 @@
 Bumpslide JS
 ============
 
-This is a collection of HTML5-inspired javascript modules by David Knape, [http://bumpslide.com/].
+This is a collection of HTML5-inspired javascript modules by David Knape, http://bumpslide.com/.
 
 
 Demos
 -----
 
-[ http://tkdave.github.com/bumpslide_js/ ]
+http://tkdave.github.com/bumpslide_js/
 
 
 
