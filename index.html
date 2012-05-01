@@ -2,39 +2,79 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=750">
     <title>Bumpslide JS</title>
     <link rel="stylesheet" type='text/css' href="css/main.css">
+
 </head>
 <body>
-<h1>Bumpslide JS</h1>
 
-<p class="about">This is a collection of HTML5-inspired javascript modules by <a href="http://bumpslide.com/">David Knape</a>.</p>
+<div id="main">
 
-<p>Source is at <a href="https://github.com/tkdave/bumpslide_js/">https://github.com/tkdave/bumpslide_js/</a></p>
+    <h1>Bumpslide JS</h1>
 
-<ul>
-    <li><a href="https://github.com/tkdave/bumpslide_js/tree/master/js/bumpslide/animation.js">animation.js</a> - wrapper around requestAnimFrame</li>
-    <li><a href="https://github.com/tkdave/bumpslide_js/tree/master/js/bumpslide/bindable.js">bindable.js</a> - a basic bindable model</li>
-    <li><a href="https://github.com/tkdave/bumpslide_js/tree/master/js/bumpslide/canvasUtil.js">canvasUtil.js</a> - some canvas drawing utilities</li>
-    <li><a href="https://github.com/tkdave/bumpslide_js/tree/master/js/bumpslide/dispatcher.js">dispatcher.js</a> - jquery-powered event bus, can also add event methods to any object</li>
-    <li><a href="https://github.com/tkdave/bumpslide_js/tree/master/js/bumpslide/mediaLoader.js">mediaLoader.js</a> - asset loader designed for HTML5 video, audio, and images</li>
-    <li><a href="https://github.com/tkdave/bumpslide_js/tree/master/js/bumpslide/mouseWatcher.js">mouseWatcher.js</a> - watches the mouse</li>
-    <li><a href="https://github.com/tkdave/bumpslide_js/tree/master/js/bumpslide/stats.js">stats.js</a> - wrapper around mr. doob's stats display</li>
-    <li><a href="https://github.com/tkdave/bumpslide_js/tree/master/js/bumpslide/timeline.js">timeline.js</a> - media timeline with support for frame-based ticks and seeking</li>
-    <li><a href="https://github.com/tkdave/bumpslide_js/tree/master/js/bumpslide/view.js">view.js</a> - barebones view component base</li>
+    <h2>
+        HTML5-inspired JavaScript modules
+        by <a href="http://bumpslide.com/">David Knape</a>
+    </h2>
 
-</ul>
+    <a href="https://github.com/tkdave/bumpslide_js"><img style="position: absolute; top: 0; right: 0; border: 0;"
+                                                          src="https://a248.e.akamai.net/camo.github.com/4c7dc970b89fd04b81c8e221ba88ff99a06c6b61/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f77686974655f6666666666662e706e67"
+                                                          alt="Fork me on GitHub"></a>
 
+    <ul>
+        <li><a href="https://github.com/tkdave/bumpslide_js/tree/master/js/bumpslide/animation.js">animation.js</a> -
+            wrapper around paulirish-style requestAnimFrame
+        </li>
+        <li><a href="https://github.com/tkdave/bumpslide_js/tree/master/js/bumpslide/bindable.js">bindable.js</a> -
+            bindable model with property change callbacks
+        </li>
+        <li><a href="https://github.com/tkdave/bumpslide_js/tree/master/js/bumpslide/canvasUtil.js">canvasUtil.js</a> -
+            canvas drawing and image cropping utilities
+        </li>
+        <li><a href="https://github.com/tkdave/bumpslide_js/tree/master/js/bumpslide/dispatcher.js">dispatcher.js</a> -
+            jquery-powered event behavior decorator / event bus
+        </li>
+        <li><a href="https://github.com/tkdave/bumpslide_js/tree/master/js/bumpslide/mediaLoader.js">mediaLoader.js</a>
+            - asset loader, queue, and cache built for HTML5 video, audio, and images
+        </li>
+        <li>
+            <a href="https://github.com/tkdave/bumpslide_js/tree/master/js/bumpslide/mouseWatcher.js">mouseWatcher.js</a>
+            - watches the mouse, so you don't have to
+        </li>
+        <li><a href="https://github.com/tkdave/bumpslide_js/tree/master/js/bumpslide/stats.js">stats.js</a> - wrapper
+            around mr. doob's stats display
+        </li>
+        <li><a href="https://github.com/tkdave/bumpslide_js/tree/master/js/bumpslide/timeline.js">timeline.js</a> -
+            media timeline with support for frame-based ticks and seeking
+        </li>
+        <li><a href="https://github.com/tkdave/bumpslide_js/tree/master/js/bumpslide/view.js">view.js</a> - barebones
+            view component base
+        </li>
 
-<a href="test.html">Run Unit Tests</a>
+    </ul>
 
+    <br>
 
-<!--
-<div id="bumpslide-demo">
+    <p class="inset">
+        Source code structured using the <a href="http://requirejs.org/docs/whyamd.html#amd">AMD format</a> with <a
+            href="http://requirejs.org/">RequireJS</a>
+        <br>
+        External dependencies: <a href="http://documentcloud.github.com/underscore/">Underscore</a> and <a
+            href="http://jquery.com/">jQuery</a>
+        <br>
+        <a href="test.html">Unit Tests</a> powered by <a href="http://quinit.jquery.com/">QUnit</a>
+        <br>
+        Released under the open-source <a href="LICENSE.txt">MIT License</a>
+    </p>
+
+    <!--
+    <div id="bumpslide-demo">
+    </div>
+    <script type="text/javascript" src="js/require.js" data-main="js/bumpslide-demo-main"></script>
+    -->
+
 </div>
-<script type="text/javascript" src="js/require.js" data-main="js/bumpslide-demo-main"></script>
--->
-
 
 </body>
 </html>

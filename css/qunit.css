@@ -10,10 +10,14 @@
  * Last Commit: ecf1ffd3be78969bc4739c3b237d12780454726e
  */
 
+body {
+    width: 80%;
+    margin: 2em auto;
+}
 /** Font Family and Sizes */
 
 #qunit-tests, #qunit-header, #qunit-banner, #qunit-testrunner-toolbar, #qunit-userAgent, #qunit-testresult {
-	font-family: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif;
+	/*font-family: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial, sans-serif;*/
 }
 
 #qunit-testrunner-toolbar, #qunit-userAgent, #qunit-testresult, #qunit-tests li { font-size: small; }
@@ -225,4 +229,8 @@
 	position: absolute;
 	top: -10000px;
 	left: -10000px;
+}
+
+h1 input, #qunit-testrunner-toolbar input {
+    margin: 0 .5em 0 1em;
 }
