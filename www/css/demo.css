@@ -3,7 +3,10 @@ body {
     color: #ddd;
     font-family: Menlo, 'Andale Mono', Monaco, 'Courier New', Courier;
     font-size: 75%; /*  12/16 */
-    margin: 1em;
+    line-height: 150%;
+    margin: 1em auto;
+    width:664px;
+
 }
 
 p {
@@ -13,7 +16,7 @@ p {
 a, a:link, a:active, a:visited {
     text-decoration: none;
     font-weight: bold;
-    color: #abc;
+    color: #81a2b7;
     -webkit-transition: color .3s ease-out;
     -moz-transition: color .3s ease-out;
     -o-transition: color .3s ease-out;
@@ -21,7 +24,7 @@ a, a:link, a:active, a:visited {
 }
 
 a:hover, a:active {
-    color: #ec6;
+    color: #b5bc69;
 }
 
 #trace {
@@ -41,4 +44,40 @@ a:hover, a:active {
 
 }
 
+.demoStack {
+    background-color: #222222;
+    width: 664px;
+    margin:1em auto;
+    border-radius: 6px 6px 0px 0px;
+    overflow: auto;
+}
 
+.tabBar {
+    margin: 1.2em 1em 0 1em;
+
+}
+
+.tabBar button {
+    border-radius: 3px 3px 0px 0px;
+    margin-right:.5em;
+    border-width:0px;
+}
+
+button {
+    -webkit-transition: background-color .3s ease-out;
+    -moz-transition: background-color .3s ease-out;
+    -o-transition: background-color .3s ease-out;
+    transition: background-color .3s ease-out;
+    background-color: #81a2b7;
+}
+button.selected {
+   background-color: #ddd;
+}
+
+button:hover {
+   background-color:#b5bc69;
+}
+
+.demoContent {
+    margin: 0 1em 1em 1em;
+}

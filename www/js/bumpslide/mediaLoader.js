@@ -15,7 +15,7 @@ define([ 'underscore', 'bumpslide/dispatcher'], function (_, dispatcher) {
     // Automatically choose best format if no extension is specified
     var video_ext = (mv.h264 ? '.mp4' : (mv.webm ? '.webm' : '.ogv' ));
     var audio_ext = (ma.mp3 ? '.mp3' : '.ogg');
-    var cache = {}, queue = [], threads = 0, loaded = 0, count = 0, maxThreads = 4, basePath = config.mediaBasePath;
+    var cache = {}, queue = [], threads = 0, loaded = 0, count = 0, maxThreads = 4, basePath = 'media/';
 
     var processQueue = _.debounce(doProcessQueue, 50);
 
@@ -48,7 +48,7 @@ define([ 'underscore', 'bumpslide/dispatcher'], function (_, dispatcher) {
         }
     };
 
-    dispatcher.init( self );
+    _.extend( self, dispatcher() );
 
     return self;
 
@@ -114,7 +114,7 @@ define([ 'underscore', 'bumpslide/dispatcher'], function (_, dispatcher) {
         if (loaded == count) {
             setTimeout(function () {
                 if (debug) console.log('[media] Queue Complete!');
-                dispatcher.trigger('mediaLoadComplete');
+                self.trigger('mediaLoadComplete');
             }, 100);
         }
     }
@@ -222,13 +222,13 @@ define([ 'underscore', 'bumpslide/dispatcher'], function (_, dispatcher) {
         if (debug) console.log('[media] Item Complete ' + item.src + ' ' + loaded + '/' + count);
 
         // Send notifications
-        dispatcher.trigger('mediaItemSuccess', item);
+        self.trigger('mediaItemSuccess', item);
         if (_.isFunction(item.onComplete)) item.onComplete.call(null);
     }
 
     function onRequestError(item) {
         if (debug) console.error('[media] Error loading ' + item.src);
-        dispatcher.trigger('mediaItemError', item);
+        self.trigger('mediaItemError', item);
         if (_.isFunction(item.onError)) {
             item.onError.call(null);
             // if error is being watched for, don't fail to indicate progress
@@ -246,8 +246,8 @@ define([ 'underscore', 'bumpslide/dispatcher'], function (_, dispatcher) {
         clearInterval(item.checkIt);
         clearTimeout(item.pendingPause);
 
-        dispatcher.trigger('mediaItemComplete', item);
-        dispatcher.trigger('mediaProgress', loaded / count);
+        self.trigger('mediaItemComplete', item);
+        self.trigger('mediaProgress', loaded / count);
         threads--;
         processQueue();
     }

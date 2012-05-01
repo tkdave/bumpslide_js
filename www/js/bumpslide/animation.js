@@ -37,7 +37,7 @@ define( [], function() {
         return {
             run: function(){
                 paused = false;
-                doRender();
+                doRender(+new Date);
             },
 
             pause: function () {

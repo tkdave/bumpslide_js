@@ -1,15 +1,28 @@
 // event dispatcher
 // requires jquery or zepto
 
-define([], function () {
+// Example applying dispatcher properties to arbitrary object:
+//   var obj = {};
+//   _.extend(obj, dispatcher());
+//   obj.bind('hello', function(evt, name) { console.log('Hello, '+name); } );
+//   obj.trigger('hello', 'world');
 
-    var dispatcher = function () {
+define(['jquery', 'underscore'], function ($, _) {
+
+    return function ( target ) {
+
+        // target is the event target
+        // by default, this is an anonymous object,
+        // use case for this is when you want a view component
+        // to proxy events for it's underlying DOM element
+
+        if(target==undefined) target={};
 
         return {
 
             logEnabled:true,
 
-            _dispatcher:$({}),
+            _dispatcher:$(target),
 
             bind:function (event_type, handler) {
                 $.fn.bind.apply(this._dispatcher, arguments);
@@ -26,11 +39,4 @@ define([], function () {
         };
 
     };
-
-    // Add
-    dispatcher.init = function ( obj ) {
-        _.extend( obj, dispatcher() );
-    };
-
-    return dispatcher;
-})
+});

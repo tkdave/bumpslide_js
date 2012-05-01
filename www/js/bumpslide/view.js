@@ -1,4 +1,4 @@
-define(['underscore'], function (_) {
+define(['jquery', 'underscore', './dispatcher'], function ($, _, dispatcher) {
 
     // abstract base view
     var view = {
@@ -19,6 +19,7 @@ define(['underscore'], function (_) {
 
         init:function (onCreationComplete) {
             var self = this;
+
             this.onCreationComplete = onCreationComplete;
             if (!this.template) {
                 this.template = '<div>';
@@ -37,6 +38,9 @@ define(['underscore'], function (_) {
             // hide to start
             this.el.stop(true, true).hide();
 
+            // add bind/unbind/trigger methods that are fronts for similar jquery methods on the main view element
+            _.extend( this, dispatcher( this.el ) );
+
             if (this.onInit) this.onInit.call(this);
             if (this.onCreationComplete) this.onCreationComplete(this);
             return this;
@@ -50,6 +54,10 @@ define(['underscore'], function (_) {
 
         show:function (onTransitionComplete) {
             if (this.visible) return false;
+            
+            // initialize if we haven't already (no longer a need to call init explicitly)
+            if (this.el == null) this.init();
+            
             this.visible = true;
             //console.log(this + 'show()');
             if (this.onShow) this.onShow();
@@ -77,20 +85,9 @@ define(['underscore'], function (_) {
         destroy:function () {
             if (this.onDestroy) this.onDestroy.call(this);
             this.el.empty();
-        },
-
-        bind:function (event_type, handler) {
-            this.el.bind.apply(this.el, arguments);
-        },
-
-        unbind:function (event_type, handler) {
-            this.el.unbind.apply(this.el, arguments);
-        },
-
-        trigger:function () {
-            //console.log('trigger ', this, arguments);
-            this.el.triggerHandler.apply(this.el, arguments);
         }
+
+
 
     };
 
