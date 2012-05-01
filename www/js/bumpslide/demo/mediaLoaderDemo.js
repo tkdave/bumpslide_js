@@ -9,7 +9,7 @@ define(['underscore', 'bumpslide/mediaLoader', 'bumpslide/animation', 'bumpslide
         var video;
         var videoReady = false;
 
-        var startVideo = _.debounce(doStartVideo, 100);
+        var startVideo = _.debounce(doStartVideo, 500);
 
         return view.extend({
             name: 'Media Loader Demo',
@@ -17,6 +17,9 @@ define(['underscore', 'bumpslide/mediaLoader', 'bumpslide/animation', 'bumpslide
             onHide:onHide,
             onInit:function () {
                 video = mediaLoader.getVideo( 'pinch_your_head', true, onVideoReady, onVideoError);
+                video.width = 640;
+                video.height = 480;
+                video.controls = true;
             }
         });
 

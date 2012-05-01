@@ -10,8 +10,7 @@ require.config({
 require(['bumpslide/demo/demoStack', 'bumpslide/stats'], function (demoStack, stats) {
 
     var holder = $('#bumpslide-demo');
-    holder.append(demoStack.el);
-
-    stats.show();
+    //holder.append(demoStack.el);
+    //stats.show();
 
 });
