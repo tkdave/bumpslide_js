@@ -1,5 +1,8 @@
 /**
- * Image Utilities
+ * HTML5 Canvas and Image Utilities
+ *
+ * Many of these functions are small snippets gathered from the web.
+ * Links are provided
  *
  */
 
@@ -10,26 +13,36 @@ define([], function () {
 
         /**
          * Create a canvas of the given width and height
-         * @param width
-         * @param height
          */
-        create:function (width, height) {
-            if(width==null) width=64;
-            if(height==null) height=64;
+        create:function (width, height, scaleForRetina) {
+            if (width == null) width = 64;
+            if (height == null) height = 64;
+            if (scaleForRetina == null) scaleForRetina = false;
             var canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
+            var scale = (scaleForRetina && window && window.devicePixelRatio) ? window.devicePixelRatio : 1;
+            canvas.width = width * scale;
+            canvas.height = height * scale;
+            canvas.style.width = width;
+            canvas.style.height = height;
             return canvas;
         },
 
         /**
-         * off-screen rendering helper
+         * Off-screen rendering helper
          *
-         * http://kaioa.com/node/103
+         * This makes it possible to create and render something to a canvas in one quick step without having to
+         * retain a reference to the 2D drawing context.
+         *
+         * Original code at http://kaioa.com/node/103
+         *
+         * Example:
+         * var bg = canvasUtil.render( 800, 600, function (ctx) {
+         *    // draw some stuff
+         * });
          */
         render:function (width, height, renderFunction) {
             var canvas = self.create(width, height);
-            renderFunction( canvas.getContext('2d'));
+            renderFunction(canvas.getContext('2d'));
             return canvas;
         },
 
@@ -41,11 +54,11 @@ define([], function () {
          * @param height
          * @param alignment (default=.5,centered 0=top/left 1=bottom/right)
          */
-        cropImage: function ( img, width, height, alignment ) {
+        cropImage:function (img, width, height, alignment) {
 
-            if(alignment==null) alignment = .5;
-            width = Math.round( width );
-            height = Math.round( height );
+            if (alignment == null) alignment = .5;
+            width = Math.round(width);
+            height = Math.round(height);
 
             var canvas = self.create(width, height);
             var ctx = canvas.getContext('2d');
@@ -53,25 +66,25 @@ define([], function () {
             var target_aspect = width / height;
             var w = img.width;
             var h = img.height;
-            var source_aspect = w/h;
+            var source_aspect = w / h;
 
             var sw, sh, sx, sy;
 
-            if(source_aspect>target_aspect) {
+            if (source_aspect > target_aspect) {
                 // wider, crop off edges
                 sh = h;
                 sw = target_aspect * h;
                 sy = 0;
-                sx = Math.round((w - sw) * alignment );
+                sx = Math.round((w - sw) * alignment);
             } else {
                 // tall, crop off top and bottom
                 sw = w;
                 sh = w / target_aspect;
                 sx = 0;
-                sy = Math.round((h - sh) * alignment );
+                sy = Math.round((h - sh) * alignment);
             }
 
-            ctx.drawImage( img, sx, sy, sw, sh, 0, 0, width, height );
+            ctx.drawImage(img, sx, sy, sw, sh, 0, 0, width, height);
             return canvas;
         },
 
@@ -83,14 +96,14 @@ define([], function () {
          * @param sw scaled width
          * @param sh scaled height
          */
-        getImagePixelData: function (img, sw, sh) {
-            if(sw==null) sw = img.width;
-            if(sh==null) sh = img.height;
+        getImagePixelData:function (img, sw, sh) {
+            if (sw == null) sw = img.width;
+            if (sh == null) sh = img.height;
 
             var image_data;
-            self.render( sw, sh, function (ctx) {
-                ctx.drawImage( img, 0, 0, sw, sh );
-                image_data = ctx.getImageData(0,0,sw,sh);
+            self.render(sw, sh, function (ctx) {
+                ctx.drawImage(img, 0, 0, sw, sh);
+                image_data = ctx.getImageData(0, 0, sw, sh);
             });
             return image_data;
         },
@@ -112,8 +125,11 @@ define([], function () {
          * @param {Boolean} stroke Whether to stroke the rectangle. Defaults to true.
          */
         drawRoundRect:function (ctx, x, y, width, height, radius, fill, stroke) {
-            if (typeof stroke == "undefined") {
-                stroke = true;
+            if (typeof fill === "undefined") {
+                fill = true;
+            }
+            if (typeof stroke === "undefined") {
+                stroke = false;
             }
             if (typeof radius === "undefined") {
                 radius = 3;
@@ -137,8 +153,49 @@ define([], function () {
                 ctx.fill();
             }
             ctx.restore();
-        }
+        },
 
+        drawCircle:function (ctx, cx, cy, radius, fill, stroke) {
+            if (typeof fill === "undefined") {
+                fill = true;
+            }
+            if (typeof stroke === "undefined") {
+                stroke = false;
+            }
+            if (typeof radius === "undefined") {
+                radius = 3;
+            }
+
+            ctx.beginPath();
+            ctx.arc(cx, cy, radius, 0, Math.PI * 2, true);
+            ctx.closePath();
+            if (stroke) {
+                ctx.stroke();
+            }
+            if (fill) {
+                ctx.fill();
+            }
+        },
+
+        // draw image to canvas at native resolution or half size if on retina
+        // if on retina, we assume that we are using a double-resolution image (@2x)
+        // if this is not the case, then you have no need for this method
+        drawImageX:function (ctx, img) {
+            if (window !== undefined && window.devicePixelRatio !== undefined) {
+                var r = window.devicePixelRatio;
+                //console.log( 'window.devicePixelRatio:', r);//ctx.canvas, ctx.canvas.style );
+                //var canvas_scale = (ctx.canvas.width/ctx.canvas.style.width);
+                var scale = (r > 1 && img.src.indexOf('@2x')!=-1) ? .5 : 1; // accomodate double-resolution images
+                //scale *= r/canvas_scale; // accomodate pixel ratio and canvas scale
+                //console.log( 'scale:'+canvas_scale);
+            }
+            if(scale==0) scale=1;
+            ctx.drawImage(img, 0, 0, img.width * scale, img.height * scale);
+        },
+
+        isRetina:function () {
+            return window.devicePixelRatio > 1;
+        }
 
     };
 

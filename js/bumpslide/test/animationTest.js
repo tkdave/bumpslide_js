@@ -1,23 +1,26 @@
 define(['bumpslide/animation', 'underscore'], function (animation, _)
 {
-    asyncTest('Animation', function ()
+    asyncTest('bumpslide.animation', function ()
     {
         var anim = animation( render );
-        var count = 0;
 
+        console.log( anim );
+        var count = 0;
         var startTime = (+new Date);
 
         ok( startTime>0, 'valid start time');
 
         ok(anim, 'anim exists');
 
-        anim.run();
+        anim.play();
+
 
         function render(time) {
 
             var now = (+new Date);
             var runTime = time-startTime;
 
+            //console.log('render:', time, runTime, count);
 
             // only run this once
             if(count==3) {
@@ -34,7 +37,7 @@ define(['bumpslide/animation', 'underscore'], function (animation, _)
                 // calculate FPS
                 var fps = (1000 * count/runTime).toFixed(3);
                 ok( fps > 45 && fps < 75, 'FPS should be around 60 fps ('+fps+' fps)');
-                anim.pause();
+                anim.stop();
 
                 // restart qunit
                 start();

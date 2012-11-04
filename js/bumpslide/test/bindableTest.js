@@ -1,6 +1,6 @@
 define(['bumpslide/bindable'], function (bindable) {
 
-    test('Bindable', function () {
+    test('bumpslide.bindable', function () {
 
         var notes = [],
             m = bindable({ age:25, message:"Hello" });

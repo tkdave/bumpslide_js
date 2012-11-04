@@ -1,15 +1,34 @@
-define(['underscore', 'bumpslide/view', 'text!./demoStack.html', './animationDemo', './mediaLoaderDemo', 'bumpslide/bindable'], function (_, view, template, animationDemo, mediaLoaderDemo, bindable) {
+define(['underscore',
+    'bumpslide/view',
+    'text!templates/mainView.html',
+    './controller',
+    './demos/welcomeDemo',
+    './demos/animationDemo',
+    './demos/mediaLoaderDemo'],
+    function (_, view, template, controller, welcomeDemo, animationDemo, mediaLoaderDemo) {
 
-    var demos = [ animationDemo(), mediaLoaderDemo() ];
-    var model = bindable({ selectedIndex:0 });
-    var tabButtons, tabBar, contentHolder;
+    var demos = {
+        'welcome': welcomeDemo(),
+        'animation': animationDemo(),
+        'media': mediaLoaderDemo()
+    };
 
-    var self = view.extend({
-        template:template,
-        onInit:function () {
+    var $links, $menu, $holder;
+
+    var self = _.extend(view(), {
+
+        template: template,
+
+        onInit: function () {
+
+            $holder = this.$('.demoHolder')
+            $menu = this.$('ul');
+            $links = this.$('ul > li > a');
+
+            controller.bind('demo', showDemo);
 
             tabBar = $('div.tabBar', this.el);
-            contentHolder =  $('.demoContent', this.el);
+            contentHolder = $('.demoContent', this.el);
 
             // create buttons
             for (var n = 0; n < demos.length; n++) {
@@ -21,6 +40,11 @@ define(['underscore', 'bumpslide/view', 'text!./demoStack.html', './animationDem
 
             model.bind('selectedIndex', onDemoChange, true);
 
+        },
+
+        showDemo: function (demoName) {
+
+            if(currentDemo) currentDemo.hide();
         }
     });
 
@@ -35,7 +59,7 @@ define(['underscore', 'bumpslide/view', 'text!./demoStack.html', './animationDem
     function onDemoChange(selectedDemo) {
 
         // update tab state
-        tabButtons.each( function() {
+        tabButtons.each(function () {
             var btn = $(this);
             btn.toggleClass('selected', btn.index() == selectedDemo);
         });
@@ -47,11 +71,11 @@ define(['underscore', 'bumpslide/view', 'text!./demoStack.html', './animationDem
 
         contentHolder.children().remove();
 
-        _.delay( function (){
+        _.delay(function () {
             // show the current demo
             var demo = demos[selectedDemo];
             demo.show();
-            contentHolder.append( demo.el );
+            contentHolder.append(demo.el);
         }, 100);
 
 

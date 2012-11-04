@@ -1,0 +1,3 @@
+
+- User "playable" interface for animation util
+- Canvas Utils should not be hard-coded to 2X retina. Use back-buffer size and calculate accordingly. 

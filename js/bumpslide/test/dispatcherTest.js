@@ -1,6 +1,6 @@
 define(['bumpslide/dispatcher', 'underscore'], function (dispatcher, _)
 {
-    test('Dispatcher stand-alone', function ()
+    test('bumpslide.dispatcher (instance)', function ()
     {
         var hits=0;
         function onHello(event, data) {
@@ -16,7 +16,7 @@ define(['bumpslide/dispatcher', 'underscore'], function (dispatcher, _)
         ok(hits==1, 'Event handler should have only fired once.');
     });
 
-    test('Dispatcher applied', function () {
+    test('bumpslide.dispatcher (decorator)', function () {
         var hits=0;
         function onHello(event, data) {
             hits++;

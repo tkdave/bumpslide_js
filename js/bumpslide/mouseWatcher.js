@@ -1,4 +1,8 @@
-define([], function () {
+define(['jquery'], function ($) {
+
+    /**
+     * Watches mouse location and provides method for retrieving local coordinates
+     */
 
     return function () {
 
@@ -6,27 +10,27 @@ define([], function () {
 
             passive: true,
 
-            loc:{ x:0, y:0 },
+            loc: { x: 0, y: 0 },
 
-            target:null,
+            target: null,
 
             // start watching the mouse
-            start:function () {
+            start: function () {
                 this.passive = true;
                 $(document).bind('mousemove', onMouseMove);
                 $(document).bind('MSPointerDown', onMSPointerDown);
             },
 
             // stop watching the mouse
-            stop:function () {
+            stop: function () {
                 $(document).unbind('mousemove', onMouseMove);
-                $(document).unbind('MSPointerDown', onMSPointerDown);                
+                $(document).unbind('MSPointerDown', onMSPointerDown);
                 $(document).unbind('MSPointerMove', onMSPointerMove);
             },
 
-            getLocal:function (scope) {
+            getLocal: function (scope) {
                 var offset = $(scope).offset();
-                return { x:this.loc.x - offset.left, y:this.loc.y - offset.top };
+                return { x: this.loc.x - offset.left, y: this.loc.y - offset.top };
             }
         };
 
@@ -38,18 +42,13 @@ define([], function () {
             mouseWatcher.passive = false;
         }
 
-        function onMSPointerDown(e){
-            e.originalEvent.preventMouseEvent();          
+        function onMSPointerDown(e) {
+            e.originalEvent.preventMouseEvent();
             $(document).bind('MSPointerMove', onMSPointerMove);
         }
 
-        /*function onMSPointerUp(e){
-            console.log('mspointerup - mousewatcher');            
-            $(document).unbind('MSPointerMove', onMSPointerMove);
-        }*/
-
-        function onMSPointerMove(e){
-            e.originalEvent.preventMouseEvent();            
+        function onMSPointerMove(e) {
+            e.originalEvent.preventMouseEvent();
             mouseWatcher.loc.x = e.originalEvent.pageX;
             mouseWatcher.loc.y = e.originalEvent.pageY;
         }

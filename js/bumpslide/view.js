@@ -1,95 +1,108 @@
-define(['jquery', 'underscore', './dispatcher'], function ($, _, dispatcher) {
+define(['underscore', 'jquery', './dispatcher', './loggable'], function (_, $, dispatcher, loggable) {
 
-    // abstract base view
-    var view = {
+    /**
+     *  View templating, events, and render methods.
+     *
+     *  @author David Knape, http://bumpslide.com/
+     */
+    return function () {
 
-        name:'view',
-        visible:false,
-        templateProps:{},
+        // abstract base view
+        var self = _.extend( loggable(), dispatcher(), {
 
-        // returns clone of abstract view (subclass) with these additional properties
-        extend:function (props) {
-            var obj = _.clone(this);
-            return _.extend(obj, props);
-        },
+            name: 'view',
+            visible: false,
 
-        toString:function () {
-            return '[views/' + this.name + '] ';
-        },
+            // template and properties
+            template: '<div></div>',
+            templateData: {},
 
-        init:function (onCreationComplete) {
-            var self = this;
+            // jquery shortcut scoped ot the current element
+            $: function() { this.el.query.apply(this.el, _.toArray(arguments));},
 
-            this.onCreationComplete = onCreationComplete;
-            if (!this.template) {
-                this.template = '<div>';
-            }
-            try {
-                //console.log(this + 'init()');
-                var html = _.template(this.template, this.templateProps);
-                self.el = $(html);
-            } catch (e) {
-                //console.log( 'Error processing template.', this.templateProps );
-            }
-            if (this.el == null) {
-                this.el = $('<div class="templateError">Error loading template for view "' + this.name + '"</div>');
-            }
+            toString: function () {
+                return '[views/' + this.name + '] ';
+            },
 
-            // hide to start
-            this.el.stop(true, true).hide();
+            init: function (onCreationComplete) {
 
-            // add bind/unbind/trigger methods that are fronts for similar jquery methods on the main view element
-            _.extend( this, dispatcher( this.el ) );
+                this.onCreationComplete = onCreationComplete;
 
-            if (this.onInit) this.onInit.call(this);
-            if (this.onCreationComplete) this.onCreationComplete(this);
-            return this;
-        },
 
-        doInit:function () {
-            if (this.onInit) this.onInit.call(this);
-            //console.log( 'creation complete', this.onCreationComplete );
-            if (this.onCreationComplete) this.onCreationComplete(this);
-        },
+                // If element already exists, use it, but make sure it's jqueried
+                if (this.el != null) {
+                    this.el = $(this.el);
+                } else {
+                    if (!this.template) {
+                        this.template = '<div>';
+                    }
+                    try {
+                        //console.log(this + 'init()');
+                        var html = _.template(this.template, this.templateData);
+                        self.el = $(html);
+                    } catch (e) {
+                        //console.log( 'Error processing template.', this.templateProps );
+                    }
+                    if (this.el == null) {
+                        this.el = $('<div class="templateError">Error loading template for view "' + this.name + '"</div>');
+                    }
+                }
 
-        show:function (onTransitionComplete) {
-            if (this.visible) return false;
-            
-            // initialize if we haven't already (no longer a need to call init explicitly)
-            if (this.el == null) this.init();
-            
-            this.visible = true;
-            //console.log(this + 'show()');
-            if (this.onShow) this.onShow();
-            if (this.transitionIn) {
-                this.transitionIn(onTransitionComplete);
-            } else {
-                this.el.stop(true, true).show();
-                if (onTransitionComplete) onTransitionComplete();
-            }
-        },
-
-        hide:function (onTransitionComplete) {
-            if (!this.visible) return false;
-            this.visible = false;
-            //console.log(this + 'hide()');
-            if (this.onHide) this.onHide();
-            if (this.transitionOut) {
-                this.transitionOut(onTransitionComplete);
-            } else {
+                // hide to start
                 this.el.stop(true, true).hide();
-                if (onTransitionComplete) onTransitionComplete();
+
+                // add bind/unbind/trigger methods that are fronts for similar jquery methods on the main view element
+                _.extend(this, dispatcher(this.el));
+
+                if (this.onInit) this.onInit.call(this);
+                if (this.onCreationComplete) this.onCreationComplete(this);
+                return this;
+            },
+
+            // re-render
+            draw: function() {
+                this.el.html( this._template( this.templateData ) );
+            },
+
+            show: function (onTransitionComplete) {
+                if (this.visible) return false;
+
+                // initialize if we haven't already (no longer a need to call init explicitly)
+                if (this.el == null) this.init();
+
+                this.visible = true;
+                //console.log(this + 'show()');
+                if (this.onShow) this.onShow();
+                if (this.transitionIn) {
+                    this.transitionIn(onTransitionComplete);
+                } else {
+                    this.el.stop(true, true).show();
+                    if (onTransitionComplete) onTransitionComplete();
+                }
+            },
+
+            hide: function (onTransitionComplete) {
+                if (!this.visible) return false;
+                this.visible = false;
+                //console.log(this + 'hide()');
+                if (this.onHide) this.onHide();
+                if (this.transitionOut) {
+                    this.transitionOut(onTransitionComplete);
+                } else {
+                    this.el.stop(true, true).hide();
+                    if (onTransitionComplete) onTransitionComplete();
+                }
+            },
+
+            destroy: function () {
+                if (this.onDestroy) this.onDestroy.call(this);
+                this.el.empty();
             }
-        },
-
-        destroy:function () {
-            if (this.onDestroy) this.onDestroy.call(this);
-            this.el.empty();
-        }
 
 
 
-    };
+        };
 
-    return view;
+        return view;
+    }
 });

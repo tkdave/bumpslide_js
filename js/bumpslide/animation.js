@@ -1,74 +1,83 @@
-define( [], function() {
+define(['underscore', './playable'], function (_, playable) {
 
     // tweaked version of Paul Irish's requestAnimFrame
     // shim layer with setTimeout fallback - see https://gist.github.com/979055
-    (function(){
-        window.requestAnimFrame=(function(){return window.requestAnimationFrame||window.webkitRequestAnimationFrame||window.mozRequestAnimationFrame||window.oRequestAnimationFrame||window.msRequestAnimationFrame||function(b,a){return window.setTimeout(function(){b(+new Date)},1000/60)}})();
-        window.cancelRequestAnimFrame=(function(){return window.cancelAnimationFrame||window.webkitCancelRequestAnimationFrame||window.mozCancelRequestAnimationFrame||window.oCancelRequestAnimationFrame||window.msCancelRequestAnimationFrame||clearTimeout})()
+    (function () {
+        window.requestAnimFrame = (function () {
+            return window.requestAnimationFrame || window.webkitRequestAnimationFrame || window.mozRequestAnimationFrame || window.oRequestAnimationFrame || window.msRequestAnimationFrame || function (b, a) {
+                return window.setTimeout(function () {
+                    b(+new Date);
+                }, 1000 / 60);
+            }
+        })();
+        window.cancelRequestAnimFrame = (function () {
+            return window.cancelAnimationFrame || window.webkitCancelRequestAnimationFrame || window.mozCancelRequestAnimationFrame || window.oCancelRequestAnimationFrame || window.msCancelRequestAnimationFrame || clearTimeout;
+        })()
     })();
 
     /**
-     * Wrapper around requestAnimFrame (included)
+     *  bumpslide.animation
+     *  ===================
      *
-     * Example:
+     *  This is a requestAnimationFrame shim with a little syntactic sugar.
+     *  It implements the bumpslide.playable interface.
      *
-     * var myIntroAnim = animation( renderIntro );
+     *  For more advanced control, use bumpslide.timeline which wraps this
+     *  with pause, timing, and media sync functions.
      *
-     * function renderIntro( time ) {
-     *   intro.css({left: Math.sin( time/1000 * Math.PI*2 ) * 200 });
-     * }
+     *  Example:
+     *  `
+     *    var myIntroAnim = animation( renderIntro );
      *
-     * myIntroAnim.run();
+     *    function renderIntro( time ) {
+     *      intro.css({left: Math.sin( time/1000 * Math.PI*2 ) * 200 });
+     *    }
      *
-     * setTimeout( function() {
-     *   myIntroAnim.pause();
-     * }, 3000 );
+     *    myIntroAnim.play();
      *
-     * Author: David Knape, http://bumpslide.com/
+     *    setTimeout( function() {
+     *      myIntroAnim.stop();
+     *    }, 3000 );
+     *  `
+     *  @author David Knape, http://bumpslide.com/
      */
-    
-    return function ( render_function, element_scope ) {
-        
-        var paused = false,
-            render = render_function,
-            animRequest = null;
-        
-        // animation object
-        return {
-            run: function(){
-                paused = false;
-                doRender(+new Date);
+    return function (render_function, element_scope) {
+
+        var animRequest = null;
+
+        var self = _.extend(playable(), {
+
+            onPlayStateChange: function (play) {
+                if (play) {
+                    doRender(+new Date);
+                } else {
+                    window.cancelRequestAnimFrame(animRequest);
+                }
             },
 
-            pause: function () {
-                paused = true;
-                cancelRequestAnimFrame( animRequest );
-            },
-
-            setRenderFunction: function ( render_function ) {
-                render = render_function;
+            setRenderFunction: function (func) {
+                render_function = func;
             }
-        }
-        
-        
-        
+
+        });
+
+        return self;
+
         function doRender(time) {
-            // cancel doesn't work on mozilla yet?
+
+            // cancel doesn't work on old mozilla
             // return if paused (don't request another frame)
-            if(paused) return;
-            
+            if (!self.isPlaying()) return;
+
             // call the render function
-            if(typeof render == 'function') {
-                render(time);
-            }
+            if (_.isFunction(render_function)) render_function(time);
 
-            cancelRequestAnimFrame( animRequest );
-
-
-            // run again
-            animRequest = requestAnimFrame( doRender, element_scope );
+            // again...
+            window.cancelRequestAnimFrame(animRequest);
+            animRequest = window.requestAnimFrame(doRender, element_scope);
         }
     };
-    
-    
+
+
 });
+

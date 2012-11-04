@@ -8,19 +8,26 @@
 
 define([ 'underscore', 'bumpslide/dispatcher'], function (_, dispatcher) {
 
-    // requires Modernizr
-    var mv = Modernizr.video;
-    var ma = Modernizr.audio;
+    // use modernizr, if found, to determine ideal media format
+    var m = window.Modernizr || null;
+
+    if (m == null) {
+        console.log('Warning: Bumpslide mediaLoader needs Modernizr to detect media format support. Defaulting to h264 and mp3.');
+        m = {
+            video:{ h264:true },
+            audio:{ mp3:true }
+        };
+    }
 
     // Automatically choose best format if no extension is specified
-    var video_ext = (mv.h264 ? '.mp4' : (mv.webm ? '.webm' : '.ogv' ));
-    var audio_ext = (ma.mp3 ? '.mp3' : '.ogg');
+    var video_ext = (m.video.h264 ? '.mp4' : (m.video.webm ? '.webm' : '.ogv' ));
+    var audio_ext = (m.audio.mp3 ? '.mp3' : '.ogg');
     var cache = {}, queue = [], threads = 0, loaded = 0, count = 0, maxThreads = 4, basePath = 'media/';
 
     var processQueue = _.debounce(doProcessQueue, 50);
-
-    var debug = false;
+    var debug = true;
     var nocache = false;
+    var retina = (window.devicePixelRatio > 1);
 
     var self = {
 
@@ -45,10 +52,17 @@ define([ 'underscore', 'bumpslide/dispatcher'], function (_, dispatcher) {
         getImage:function (src, onComplete, onError) {
             src = normalizePath(src, basePath);
             return getMedia('image', src, false, onComplete, onError);
+        },
+
+        // get multi-resolution image (retina vs non-retina)
+        getImageX:function (src, onComplete, onError) {
+            src = normalizePath(src, basePath);
+            src = retinizePath(src);
+            return getMedia('image', src, false, onComplete, onError);
         }
     };
 
-    _.extend( self, dispatcher() );
+    _.extend(self, dispatcher());
 
     return self;
 
@@ -66,16 +80,39 @@ define([ 'underscore', 'bumpslide/dispatcher'], function (_, dispatcher) {
         return src;
     }
 
+    /**
+     * Add retina-standard @2x suffix to image name just before the extension
+     * if we are on a retina display.
+     *
+     * @param path
+     */
+    function retinizePath(path, suffix /* @2x */) {
+        suffix = suffix || '@2x';
+        if (retina) {
+            var len = path.length;
+            return path.substr(0,len-4) + suffix + path.substr(len-4,len);
+            //var parts = path.split('.');
+            //parts[parts.length - 2] += suffix;
+            //return parts.join('.');
+        }
+
+        return path;
+
+    }
 
     /**
      * Returns image or media element and adds it to the queue
      *
-     * @param src
+     * @param type (string: 'image', 'audio', or 'video')
+     * @param src (image source relative to media basePath)
+     * @param allowStreaming (whether or not you want to stream media elements)
+     * @param onComplete (callback called when media is fully preloaded, or when ready to stream if streaming)
+     * @param onError (callback called on errors)
+     * @return image or media element
      */
     function getMedia(type, src, allowStreaming /* false */, onComplete, onError) {
 
         if (cache[src] != null) return cache[src].media;
-
         if (nocache) src = src + '?' + (+new Date);
 
         var media;

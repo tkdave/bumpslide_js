@@ -2,23 +2,27 @@
 <html lang="en-US">
 <head>
     <meta charset="UTF-8">
-
     <title>Bumpslide JS Test Runner</title>
-    <link rel="stylesheet" type="text/css" href="css/main.css" media="all">
     <link rel="stylesheet" type="text/css" href="css/qunit.css" media="all">
 </head>
 <body>
-
-<h1 id="qunit-header">Bumpslide JS Test Runner</h1>
-<h2 id="qunit-banner"></h2>
-<div id="qunit-testrunner-toolbar"></div>
-<h2 id="qunit-userAgent"></h2>
-<ol id="qunit-tests"></ol>
-<div id="qunit-fixture">test markup, will be hidden</div>
-
+<div id="qunit"></div>
 <script type="text/javascript" src="js/qunit.js"></script>
-<script type="text/javascript" src="js/plugins.js"></script>
-<script type="text/javascript" src="js/require.js" data-main="js/bumpslide/test/suite"></script>
+<script type="text/javascript" src="js/require.js"></script>
+<script>
 
+    QUnit.config.autostart = false;
+    QUnit.config.reorder = false;
+
+    require.config({ baseUrl: 'js', urlArgs:"bust=" + (+new Date)});
+
+    require(['bumpslide/test/suite'], function() {
+        setTimeout( function () {
+            QUnit.start();
+        }, 100);
+
+    });
+
+</script>
 </body>
 </html>

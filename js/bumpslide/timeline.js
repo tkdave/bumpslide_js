@@ -12,7 +12,7 @@ define(['underscore', './animation'], function (_, animation) {
      */
 
     var DEFAULT_OPTIONS = {
-        debugMode:true,
+        debugMode:false,
         frameRate:23.976216, // used for time-to-frame calculations
         media:null // html media element (audio or video)
     };
@@ -42,35 +42,48 @@ define(['underscore', './animation'], function (_, animation) {
 
         // public
         var self = {
-            play:play,
-            stop:reset,
-            pause:pause,
 
-            gotoAndPlay: function (f) {
-                gotoFrame( f, play );
-            },
-            gotoAndStop: function (f) {
-                gotoFrame( f, pause );
-            },
-            getCurrentFrame:function () {
-                return calculateCurrentFrame();
-            },
             isRunning:function () {
                 return running;
             },
             isSeeking:function () {
                 return seeking;
             },
+
+            play:play,
+            stop:stop,
+            pause:pause,
+
+            gotoAndPlay:function (f) {
+                gotoFrame(f, play);
+            },
+
+            gotoAndStop:function (f) {
+                gotoFrame(f, pause);
+            },
+
+            getCurrentFrame:function () {
+                return calculateCurrentFrame();
+            },
+
+            // Optional media item used as time source
+            // Useful for synchronizing animation with video
+            getMedia: function () {
+                return media;
+            },
+
+            setMedia:function (html_media_element) {
+                if (media) media.removeEventListener('seeked', onMediaSeek);
+                media = html_media_element
+                media.addEventListener('seeked', onMediaSeek);
+            },
+
             getTimecode:function () {
                 return secondsToTimecode(getCurrentTime(), options.frameRate);
             },
+
             setTimecode:function (hh_mm_ss_ff) {
                 seekTo(timecodeToSeconds(hh_mm_ss_ff, options.frameRate));
-            },
-            setMedia:function (html_media_element) {
-                if(media) media.removeEventListener('seeked', onMediaSeek);
-                media = html_media_element
-                media.addEventListener('seeked', onMediaSeek);
             }
         };
 
@@ -88,6 +101,7 @@ define(['underscore', './animation'], function (_, animation) {
                 } else {
                     // adjust start time to account for current frame setting
                     startTime = +(new Date) - Math.round((currentFrame / options.frameRate));
+                    if (onSeekComplete) _.delay(onSeekComplete, 1);
                 }
             } else {
                 console.log('cannot goto frame ' + frame);
@@ -101,13 +115,13 @@ define(['underscore', './animation'], function (_, animation) {
             seeking = true;
             pause();
             seekInterval = setInterval(doSeekTargetTime, 300); // keep trying until we get it
-            _.delay( doSeekTargetTime, 100 );
+            _.delay(doSeekTargetTime, 100);
             //$(media).hide();
         }
 
         function onMediaSeek(event) {
             //console.log('seek complete', event);
-            if(onSeekComplete) _.delay( onSeekComplete, 10);
+            if (onSeekComplete) _.delay(onSeekComplete, 10);
             //$(media).show();
         }
 
@@ -143,7 +157,7 @@ define(['underscore', './animation'], function (_, animation) {
             if (media) media.pause();
             anim.pause();
             running = false;
-            onRender(currentFrame);
+            //onRender(currentFrame);
         }
 
         function getCurrentTime() {
@@ -168,7 +182,7 @@ define(['underscore', './animation'], function (_, animation) {
             }
         }
 
-        function reset() {
+        function stop() {
             startTime = 0;
             currentFrame = 0;
             anim.pause();

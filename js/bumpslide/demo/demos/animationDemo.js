@@ -12,7 +12,8 @@ define(['underscore', 'bumpslide/canvasUtil', 'bumpslide/animation', 'bumpslide/
         // our animation loop
         var colorCycleAnimation = animation( renderPrettyColors );
 
-        return view.extend({
+
+        return _.extend( view(), {
             name: 'Animation Demo',
             onShow:onShow,
             onHide:onHide
@@ -20,12 +21,12 @@ define(['underscore', 'bumpslide/canvasUtil', 'bumpslide/animation', 'bumpslide/
 
         function onShow() {
             this.el.append( canvas );
-            colorCycleAnimation.run();
+            colorCycleAnimation.play();
         }
 
         function onHide() {
             this.el.children().remove();
-            colorCycleAnimation.pause();
+            colorCycleAnimation.stop();
         }
 
         function renderPrettyColors(t) {
@@ -42,6 +43,8 @@ define(['underscore', 'bumpslide/canvasUtil', 'bumpslide/animation', 'bumpslide/
             canvas_ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         }
+
+
     }
 
 
