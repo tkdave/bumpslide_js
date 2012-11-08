@@ -6,7 +6,7 @@
 // we also automatically append the right format extension for the current browser
 // if no file extension is provided (for video and audio)
 
-define([ 'underscore', 'bumpslide/dispatcher'], function (_, dispatcher) {
+define([ 'underscore', 'jquery', 'bumpslide/dispatcher'], function (_, $, dispatcher) {
 
     // use modernizr, if found, to determine ideal media format
     var m = window.Modernizr || null;
@@ -23,6 +23,7 @@ define([ 'underscore', 'bumpslide/dispatcher'], function (_, dispatcher) {
     var video_ext = (m.video.h264 ? '.mp4' : (m.video.webm ? '.webm' : '.ogv' ));
     var audio_ext = (m.audio.mp3 ? '.mp3' : '.ogg');
     var cache = {}, queue = [], threads = 0, loaded = 0, count = 0, maxThreads = 4, basePath = 'media/';
+    var iOS = ( navigator.userAgent.match(/(iPad|iPhone|iPod)/i) ? true : false );
 
     var processQueue = _.debounce(doProcessQueue, 50);
     var debug = true;
@@ -75,7 +76,7 @@ define([ 'underscore', 'bumpslide/dispatcher'], function (_, dispatcher) {
      * @param appendExtension
      */
     function normalizePath(src, prependPath, appendExtension) {
-        if (appendExtension != null && src.charAt(-4) != '.') src += appendExtension;
+        if (appendExtension != null && src.charAt(src.length-4) != '.') src += appendExtension;
         if (src.substr(0, 4) != 'http') src = prependPath + src;
         return src;
     }
@@ -83,17 +84,12 @@ define([ 'underscore', 'bumpslide/dispatcher'], function (_, dispatcher) {
     /**
      * Add retina-standard @2x suffix to image name just before the extension
      * if we are on a retina display.
-     *
-     * @param path
      */
     function retinizePath(path, suffix /* @2x */) {
         suffix = suffix || '@2x';
         if (retina) {
             var len = path.length;
             return path.substr(0,len-4) + suffix + path.substr(len-4,len);
-            //var parts = path.split('.');
-            //parts[parts.length - 2] += suffix;
-            //return parts.join('.');
         }
 
         return path;
@@ -198,6 +194,7 @@ define([ 'underscore', 'bumpslide/dispatcher'], function (_, dispatcher) {
 
     function streamMediaItem(item) {
 
+        //console.log('[media] streaming ', item.media);
         var media = item.media;
 
         item.onCanPlayThrough = _.bind(onCanPlayThrough, item);

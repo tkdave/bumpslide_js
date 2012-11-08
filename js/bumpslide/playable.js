@@ -8,26 +8,28 @@
  */
 define([], function () {
 
-    return function () {
 
-        var _playing = false;
+    return function () {
 
         var self = {
 
+
+            _playing: false,
+
             isPlaying: function () {
-                return _playing;
+                return this._playing;
             },
 
             play: function () {
-                if(_playing) return;
-                _playing = true;
-                self.onPlayStateChange(_playing);
+                if(this._playing) return;
+                this._playing = true;
+                this.onPlayStateChange(this._playing);
             },
 
             stop: function () {
-                if(!_playing) return;
-                _playing = false;
-                self.onPlayStateChange(_playing);
+                if(!this._playing) return;
+                this._playing = false;
+                this.onPlayStateChange(this._playing);
             },
 
             onPlayStateChange: function ( play_state ) {
@@ -36,8 +38,8 @@ define([], function () {
             },
 
             togglePlayPause: function () {
-                if(_playing)  self.stop();
-                else self.play();
+                if(this._playing)  this.stop();
+                else this.play();
             }
         };
 

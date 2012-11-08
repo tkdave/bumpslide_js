@@ -8,7 +8,7 @@ define(['underscore', 'jquery', './dispatcher', './loggable'], function (_, $, d
     return function () {
 
         // abstract base view
-        var self = _.extend( loggable(), dispatcher(), {
+        var self = _.extend( loggable(), {
 
             name: 'view',
             visible: false,
@@ -17,8 +17,10 @@ define(['underscore', 'jquery', './dispatcher', './loggable'], function (_, $, d
             template: '<div></div>',
             templateData: {},
 
-            // jquery shortcut scoped ot the current element
-            $: function() { this.el.query.apply(this.el, _.toArray(arguments));},
+            // jquery shortcut scoped to local DOM element
+            $: function(selector) {
+                return this.el.find(selector);
+            },
 
             toString: function () {
                 return '[views/' + this.name + '] ';
@@ -99,10 +101,8 @@ define(['underscore', 'jquery', './dispatcher', './loggable'], function (_, $, d
                 this.el.empty();
             }
 
+        });
 
-
-        };
-
-        return view;
+        return self;
     }
 });

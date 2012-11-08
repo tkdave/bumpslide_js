@@ -74,7 +74,7 @@ define(['underscore', './animation'], function (_, animation) {
 
             setMedia:function (html_media_element) {
                 if (media) media.removeEventListener('seeked', onMediaSeek);
-                media = html_media_element
+                media = html_media_element;
                 media.addEventListener('seeked', onMediaSeek);
             },
 
@@ -84,6 +84,11 @@ define(['underscore', './animation'], function (_, animation) {
 
             setTimecode:function (hh_mm_ss_ff) {
                 seekTo(timecodeToSeconds(hh_mm_ss_ff, options.frameRate));
+            },
+
+            togglePlayPause: function () {
+                if(running) pause();
+                else play();
             }
         };
 
@@ -128,14 +133,12 @@ define(['underscore', './animation'], function (_, animation) {
         function doSeekTargetTime() {
             try {
                 //console.log('Seeking to ' + targetTime);
-
                 media.currentTime = targetTime;
-
                 seeking = false;
                 clearInterval(seekInterval);
                 //onRender(currentFrame);
             } catch (e) {
-                console.log('Seek Error: ' + e);
+                //console.log('Seek Error: ' + e);
             }
         }
 
@@ -147,7 +150,7 @@ define(['underscore', './animation'], function (_, animation) {
                 startTime = +(new Date) - Math.round((currentFrame / options.frameRate));
             }
             //console.log('play frame: ', currentFrame, ' startTime: ', startTime);
-            anim.run();
+            anim.play();
             running = true;
 
             //onRender(currentFrame);
@@ -155,7 +158,7 @@ define(['underscore', './animation'], function (_, animation) {
 
         function pause() {
             if (media) media.pause();
-            anim.pause();
+            if(anim) anim.stop();
             running = false;
             //onRender(currentFrame);
         }
@@ -185,7 +188,9 @@ define(['underscore', './animation'], function (_, animation) {
         function stop() {
             startTime = 0;
             currentFrame = 0;
-            anim.pause();
+            if(anim) {
+                anim.stop();
+            }
             if (media) {
                 media.currentTime = 0.01;
                 media.pause();
