@@ -42,7 +42,25 @@ define(['bumpslide/bindable'], function (bindable) {
 
         equal(notes.length, 1, 'Calling unbind with no handler should remove all handlers for that property.');
 
+
+        // test getter setter
+        var data = bindable();
+        var component = {
+            x: data.getSet('x'),
+            y: data.getSet('y')
+        };
+
+        data.bind('x', function(x) {
+            ok( x===25, 'Setter triggers binding.' );
+        });
+        component.x( 25 );
+        ok( component.x() === 25, 'Getter returns previously set value' );
+
+
+
     });
+
+
 
 
 

@@ -46,12 +46,24 @@ define(['underscore', './loggable'], function (_, loggable) {
                 // handle object props
                 if (typeof prop == 'object') {
                     for (var p in prop) this.set(p, prop[p]);
-                    return;
+                    return false;
                 }
                 var old_val = this.props[prop];
                 if (!_.isEqual(old_val, new_val)) {
                     this.props[prop] = new_val;
                     this.notifyChanged(prop, old_val, new_val);
+                    return true;
+                }
+                return false;
+            },
+
+            // returns a getter/setter for the
+            getSet: function (prop, defaultVal) {
+                self.set(prop, defaultVal);
+                return function (val) {
+                    var old_val = self.get(prop);
+                    if(val!=undefined) self.set(prop, val);
+                    return self.get(prop, defaultVal);
                 }
             },
 
