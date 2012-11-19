@@ -11,12 +11,15 @@
 <script type="text/javascript" src="js/require.js"></script>
 <script>
 
-    QUnit.config.autostart = false;
-    QUnit.config.reorder = false;
+
 
     require.config({ baseUrl: 'js', urlArgs:"bust=" + (+new Date)});
 
     require(['bumpslide/test/suite'], function() {
+
+        QUnit.config.autostart = false;
+        QUnit.config.reorder = false;
+
         setTimeout( function () {
             QUnit.start();
         }, 100);
