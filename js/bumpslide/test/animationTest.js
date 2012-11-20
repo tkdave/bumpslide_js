@@ -2,6 +2,8 @@ define(['bumpslide/animation', 'underscore'], function (animation, _)
 {
     asyncTest('bumpslide.animation', function ()
     {
+        stop();
+
         var anim = animation( render );
 
         console.log( anim );

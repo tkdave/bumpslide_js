@@ -11,8 +11,7 @@ define(['underscore', 'bumpslide/mediaLoader', 'bumpslide/animation', 'bumpslide
 
         var startVideo = _.debounce(doStartVideo, 500);
 
-        return view.extend({
-            name: 'Media Loader Demo',
+        return _.extend( view(), {
             onShow:onShow,
             onHide:onHide,
             onInit:function () {

@@ -1,32 +1,41 @@
-define(['bumpslide/dispatcher', 'bumpslide/bindable', './mainView', 'simrou'], function (dispatcher, bindable, mainView, router) {
+define(['bumpslide/dispatcher', './state', './mainView', 'simrou'], function (dispatcher, state, mainView, router) {
 
+    state.logEnabled = true;
 
-    var controller = _.extend(dispatcher(), {
+    // application controller
+    var self = _.extend(dispatcher(), {
 
-        model: bindable({
-            demo: undefined
-        }),
-
+        // application router
         router: router({
-            '/*demo': { get: gotoDemo }
+            '/*section': { get: gotoSection }
         }),
+
+        mainView: mainView,
 
         init: function () {
+
+
+            mainView.init();
 
             // add main view
             $('#bumpslide-demo').append(mainView.el);
 
             // start router
-            this.router.start("/");
+            this.router.start("/welcome");
+
+            mainView.show();
+
+
         }
 
     });
 
-    return controller;
+    function gotoSection(event, param) {
 
-    function gotoDemo(event, param) {
-        controller.model.set('demo', param.demo || "welcome");
+        state.set('section', param.section || "welcome");
     }
+
+    return self;
 
 
 })

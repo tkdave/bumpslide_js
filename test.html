@@ -8,21 +8,24 @@
 <body>
 <div id="qunit"></div>
 <script type="text/javascript" src="js/qunit.js"></script>
+<script type="text/javascript" src="js/jquery.js"></script>
 <script type="text/javascript" src="js/require.js"></script>
 <script>
 
+    require.config({ baseUrl: 'js', urlArgs: "bust=" + (+new Date)});
 
+    require(['jquery', 'bumpslide/test/suite'], function ($) {
 
-    require.config({ baseUrl: 'js', urlArgs:"bust=" + (+new Date)});
+        $(function () {
 
-    require(['bumpslide/test/suite'], function() {
+            // pause necessary when running in grunt
+            setTimeout(function () {
+                QUnit.config.autostart = false;
+                QUnit.config.reorder = false;
+                QUnit.start();
+            }, 250);
 
-        QUnit.config.autostart = false;
-        QUnit.config.reorder = false;
-
-        setTimeout( function () {
-            QUnit.start();
-        }, 100);
+        });
 
     });
 

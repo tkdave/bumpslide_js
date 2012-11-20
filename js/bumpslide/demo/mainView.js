@@ -1,84 +1,67 @@
-define(['underscore',
-    'bumpslide/view',
-    'text!templates/mainView.html',
-    './controller',
-    './demos/welcomeDemo',
-    './demos/animationDemo',
-    './demos/mediaLoaderDemo'],
-    function (_, view, template, controller, welcomeDemo, animationDemo, mediaLoaderDemo) {
+define(['underscore', 'bumpslide/view', 'text!templates/mainView.html', './controller', './state'],
+    function (_, view, template, controller, state) {
 
-    var demos = {
-        'welcome': welcomeDemo(),
-        'animation': animationDemo(),
-        'media': mediaLoaderDemo()
-    };
+        var $mainContent, $title, $links, $menu, $holder, $source;
 
-    var $links, $menu, $holder;
+        var currentSection = null;
 
-    var self = _.extend(view(), {
+        var self = _.extend(view(), {
 
-        template: template,
+            template: template,
 
-        onInit: function () {
+            onInit: function () {
 
-            $holder = this.$('.demoHolder')
-            $menu = this.$('ul');
-            $links = this.$('ul > li > a');
+                $mainContent = this.$('.mainContent');
+                $holder = this.$('.demoContent');
+                $source = this.$('.demoSource');
+                $menu = this.$('ul');
+                $title = this.$('.demoTitle');
+                $links = this.$('ul > li > a');
+                state.bind('section', onSectionChange);
+            },
 
-            controller.bind('demo', showDemo);
-
-            tabBar = $('div.tabBar', this.el);
-            contentHolder = $('.demoContent', this.el);
-
-            // create buttons
-            for (var n = 0; n < demos.length; n++) {
-                var label = demos[n].name;
-                tabBar.append($('<button>').text(label));
+            onDestroy: function () {
+                state.unbind('section', onSectionChange);
             }
 
-            tabButtons = $('button', tabBar).click(onTabClick);
+        });
 
-            model.bind('selectedIndex', onDemoChange, true);
+        function onSectionChange(sectionName) {
 
-        },
+            if (currentSection) {
+                currentSection.destroy();
+            }
 
-        showDemo: function (demoName) {
+            $links.each( function() {
+                var $link = $(this);
+                $link.toggleClass('selected', $link.attr('href')=='#/'+sectionName);
+            });
 
-            if(currentDemo) currentDemo.hide();
+            $title.empty();
+            $holder.empty();
+            $source.empty();
+
+            $mainContent.stop(true, true).hide();
+
+
+            if (sectionName) {
+                require(["bumpslide/demo/sections/" + sectionName + "Demo"], function (demoView) {
+                    currentSection = demoView();
+                    currentSection.init();
+                    currentSection.show();
+                    $title.html(currentSection.title);
+                    $holder.empty();
+                    $holder.append(currentSection.el);
+                    $source.load("js/bumpslide/demo/sections/" + sectionName + "Demo.js");
+
+                    $mainContent.stop(true, true).fadeIn(500);
+                });
+
+            }
+
+
         }
+
+        return self;
+
     });
-
-    self.show();
-
-    return self;
-
-    function onTabClick() {
-        model.set('selectedIndex', $(this).index());
-    }
-
-    function onDemoChange(selectedDemo) {
-
-        // update tab state
-        tabButtons.each(function () {
-            var btn = $(this);
-            btn.toggleClass('selected', btn.index() == selectedDemo);
-        });
-
-        // hide any demo views and remove them
-        _.each(demos, function (v) {
-            v.hide();
-        });
-
-        contentHolder.children().remove();
-
-        _.delay(function () {
-            // show the current demo
-            var demo = demos[selectedDemo];
-            demo.show();
-            contentHolder.append(demo.el);
-        }, 100);
-
-
-    }
-
-});

@@ -45,25 +45,25 @@ define(['bumpslide/animation'], function (animation) {
 
         var tween;
 
-        options = _.defaults(options || {}, DefaultOptions);
-
         // tween instances are re-used, get active tween for this object property if it exists
         for (var n in activeTweens) {
             tween = activeTweens[n];
             if (tween.obj == obj && tween.prop == prop) {
-                // update options and target
-                tween.options = options;
+                // update options and target on exisiting tween
+                _.extend(tween.options, options);
                 tween.target = target;
+                tween.isTweening = true;
                 return tween;
             }
         }
 
         tween = {
+            isFresh: true,
             isTweening: true,
             obj: obj,
             prop: prop,
             target: target,
-            options: options,
+            options: _.defaults(options || {}, DefaultOptions),
             stop: function () {
                 this.isTweening = false;
             }
@@ -71,12 +71,16 @@ define(['bumpslide/animation'], function (animation) {
 
         activeTweens.push(tween);
 
-        if (!anim.isPlaying()) {
-            anim.play();
-        }
+        // we should be able to intantly stop a tween. wait for a just a bit before we start
+        setTimeout(function () {
+            //console.log('enabling tween', tween.prop, tween.target);
+            tween.isFresh = false;
+            if(!anim.isPlaying()) anim.play();
+        }, 1);
 
         return tween;
     }
+
 
     function loop(time) {
 
@@ -85,8 +89,19 @@ define(['bumpslide/animation'], function (animation) {
             return tween.isTweening;
         });
 
+        if (activeTweens.length == 0) {
+            console.log('all tweens done, stopping animation loop');
+            anim.stop();
+            return;
+        }
+
         // update active tweens
         _.each(activeTweens, function (tween) {
+
+            if (tween.isFresh) {
+                return;
+            }
+
             if (tween.velocity === undefined) {
                 tween.velocity = 0;
             }
@@ -110,17 +125,6 @@ define(['bumpslide/animation'], function (animation) {
                 current = Math.round(current);
             }
 
-
-            setPropertyValue(tween.obj, tween.prop, current);
-
-            // trace
-            console.log('updated tween.  current:' + current + ' target:' + tween.target + ' veloc:' + velocity);
-
-            // call onUpdate callback
-            if (_.isFunction(options.onUpdate)) {
-                options.onUpdate.call(null, tween);
-            }
-
             // if result is to be rounded, no need to get too precise
             if (options.keepRounded) {
                 options.minDelta = Math.max(options.minDelta, .5);
@@ -132,39 +136,59 @@ define(['bumpslide/animation'], function (animation) {
             var stopped = velocity == 0 && tween.velocity == 0;
 
             tween.velocity = velocity;
+            tween.current = current;
+
+            setPropertyValue(tween.obj, tween.prop, current);
+
+            // trace
+            //console.log('updated tween.  current:' + current + ' target:' + tween.target + ' veloc:' + velocity);
+
+            // call onUpdate callback
+            if (_.isFunction(options.onUpdate)) {
+                options.onUpdate.call(null, tween);
+            }
 
             // if we are close and not moving very fast, or if we aren't moving anymore, then finish up
             if (close_enough && slow_enough) {
-                console.log('close enough, distance=' + dist_from_target);
+                //console.log('close enough, distance=' + dist_from_target);
                 finish(tween);
             } else if (stopped) {
-                console.log('no longer moving, distance=' + dist_from_target);
-                finish( tween );
+                //console.log('no longer moving, distance=' + dist_from_target);
+                finish(tween);
             }
         });
     }
 
-    function finish( tween ) {
+    function finish(tween) {
         tween.isTweening = false;
-        setPropertyValue(tween.obj, tween.prop, tween.target );
-        if(_.isFunction(tween.options.onComplete)) {
-            tween.options.onComplete.call( null, tween );
+        setPropertyValue(tween.obj, tween.prop, tween.target);
+        if (_.isFunction(tween.options.onComplete)) {
+            tween.options.onComplete.call(null, tween);
         }
     }
 
-
     function setPropertyValue(obj, prop, val) {
         if (_.isFunction(prop)) {
+            // prop is a function
+            prop.call(obj, val);
+        } else if (_.isFunction(obj[prop])) {
+            // prop is the name of a function
             obj[prop].call(obj, val);
         } else {
+            // prop is the name of a property
             obj[prop] = val;
         }
     }
 
     function getPropertyValue(obj, prop) {
         if (_.isFunction(prop)) {
+            // prop is a function
+            return prop.call(obj);
+        } else if (_.isFunction(obj[prop])) {
+            // prop is the name of a function
             return obj[prop].call(obj);
         } else {
+            // prop is the name of a property
             return obj[prop];
         }
     }
@@ -177,6 +201,32 @@ define(['bumpslide/animation'], function (animation) {
         return (target - current) * options.gain;
     }
 
+
+    ftween.getActiveTweens = function () {
+        return activeTweens.filter(function (tween) {
+            return tween.isTweening;
+        });
+    };
+
+    ftween.stop = function (obj, prop) {
+        var tweens = activeTweens.filter(function (tween) {
+            if (prop !== undefined) {
+                return tween.obj === obj && tween.prop === prop;
+            } else {
+                return tween.obj === obj;
+            }
+        });
+
+        // signal for removal
+        _.each(tweens, function (tween) {
+            tween.isTweening = false;
+        });
+    };
+
+    ftween.stopAll = function () {
+        activeTweens = [];
+        anim.stop();
+    };
 
     return ftween;
 
