@@ -329,7 +329,7 @@ define([], function () {
         return g
     })();
     a.Route = e;
-    window.Simrou = jQuery.Simrou = a;
+    window.Simrou = /*jQuery.Simrou = */ a;
 
     return function (paths) {
        return new  a(paths);
